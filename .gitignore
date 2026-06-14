@@ -1,0 +1,29 @@
+# Dependências
+node_modules/
+
+# Variáveis de ambiente (contém credenciais — nunca commitar)
+.env
+
+# Build de produção
+dist/
+
+# Uploads de chamados (dados reais de usuários)
+uploads/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Sistema operacional
+.DS_Store
+Thumbs.db
+
+# Editor
+.vscode/
+.idea/
+
+# Documentação interna (contexto de desenvolvimento, não vai para o repositório público)
+_documentacao/
+
+# Claude Code
+.claude/
