@@ -2,7 +2,16 @@
 
 Sistema de gestão de TI desenvolvido para controle completo do ambiente tecnológico corporativo. Reúne em uma única aplicação o gerenciamento de chamados, inventário do parque tecnológico, estoque de suprimentos, impressão de etiquetas e geração de relatórios.
 
-> Projeto desenvolvido para uso real em ambiente corporativo, com foco em operação 100% local (offline), sem dependência de serviços externos.
+## Demo
+
+**Acesso online:** https://centralti.vercel.app/
+
+| Campo | Valor |
+|-------|-------|
+| E-mail | centralti@centralti.com |
+| Senha | 1234 |
+
+> Deploy: React + Express na Vercel · Banco de dados: Supabase PostgreSQL
 
 ---
 
