@@ -27,7 +27,7 @@ const TIPOS_PRODUTO_REQ = ["Mouse", "Teclado", "Cabo", "Toner", "Memória RAM", 
  * @param {function} props.onClose - Fecha modal
  * @param {function} props.onCriada - Callback após a criação bem-sucedida
  */
-function modalRequisicao({ chamado, onClose, onCriada }){
+function ModalRequisicao({ chamado, onClose, onCriada }){
   const [tipo,        setTipo]      = useState(null); //'entrada' || 'saida'
   const [produtos,    setProdutos]  = useState([]);
   const [itens,       setItens]     = useState([{ estoque_item_id: "", quantidade: 1}]);

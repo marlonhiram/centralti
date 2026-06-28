@@ -761,7 +761,7 @@ app.get("/equipamentos/:id/chamados", async (req, res) => {
 app.get("/estoque/itens", async (req, res) => {
   try {
     const { rows } = await pool.query(
-      `SELECT * FROM estoque_itens ORDER BY name ASC`
+      `SELECT * FROM estoque_itens ORDER BY nome ASC`
     );
     ok(res, rows);
   } catch (e) { err(res, e); }
@@ -770,11 +770,11 @@ app.get("/estoque/itens", async (req, res) => {
 // POST /estoque/itens - Cadastra novo produto
 app.post("/estoque/itens", async (req, res) => {
   try{
-    const { nome, tipo, unidade, qunatidade, qtd_minima } = req.body;
+    const { nome, tipo, unidade, quantidade, qtd_minima } = req.body;
     const { rows } = await pool.query(
       `INSERT INTO estoque_itens (nome, tipo, unidade, quantidade, qtd_minima)
        VALUES ($1, $2, $3, $4, $5) RETURNING *`,
-       [nome, tipo, unidade, quantidade || 0, qtd_minima || 0]
+       [nome, tipo, unidade, Number(quantidade) || 0, Number(qtd_minima) || 0]
     );
     ok(res, rows[0]);
   } catch (e) { err(res, e); }
@@ -857,7 +857,7 @@ app.post("/estoque/requisicoes", async (req, res) => {
     }
 
     //Cria cabeçalho
-    const { rows: [req_] } = await Client.query(
+    const { rows: [req_] } = await client.query(
       `INSERT INTO estoque_requisicoes (chamado_id, tipo, status)
        VALUES ($1, $2, 'pendente') RETURNING *`,
        [chamado_id, tipo]
@@ -865,9 +865,9 @@ app.post("/estoque/requisicoes", async (req, res) => {
 
     // insere linhas
     for (const item of itens) {
-      await ClientRequest.query(
+      await client.query(
       `INSERT INTO estoque_requisicao_itens (requisicao_id, estoque_item_id, quantidade)
-       VALUES ($1, $2, $3)`
+       VALUES ($1, $2, $3)`,
        [req_.id, item.estoque_item_id, item.quantidade]
       );
     }
@@ -911,7 +911,7 @@ app.post("/estoque/requisicoes/:id/finalizar", async (req, res) =>{
     //Finaliza requisicao
     const { rows: [finalizada]} = await client.query(
       `UPDATE estoque_requisicoes SET status='finalizada', observacao=$1, finalizado_em=NOW()
-       WHERE id=$2 RETURNING`
+       WHERE id=$2 RETURNING *`,
        [observacao || null, req.params.id]
     );
 
@@ -936,7 +936,7 @@ app.post("/estoque/requisicoes/descontar-saida", async (req, res) => {
     // Busca requisicoes de saída pendentes do chamado
     const { rows: reqs } = await client.query(
       `SELECT * FROM estoque_requisicoes
-       WHERE chamado_id=$1 AND tipo='saida' AND status='pendente'`
+       WHERE chamado_id=$1 AND tipo='saida' AND status='pendente'`,
        [chamado_id]
     );
 
