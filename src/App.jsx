@@ -3,6 +3,8 @@
  * Gerencia a navegação entre módulos e o estado global dos chamados.
  */
 import { useState, useEffect, useCallback } from "react";
+import { useAuth } from "./contexts/AuthContext";
+import Login from "./pages/Login";
 import Inventario from "./Inventario";
 import Relatorios from "./Relatorios";
 import Etiquetas from "./Etiquetas";
@@ -21,8 +23,26 @@ import {
   slaStatus, fmtDatetime 
 } from "./utils/helpers";
 
-// ─── APP PRINCIPAL ─────────────────────────────────────────────────────────────
+// ─── GUARD DE AUTENTICAÇÃO ──────────────────────────────────────────────────────
+// App só decide qual "tela raiz" mostrar. Os hooks ficam dentro de MainApp.
 export default function App() {
+  const { session } = useAuth();
+
+  if (session === undefined) return (
+    <div style={{ height: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#1a3a6b", color: "#fff", fontFamily: "'Nunito',sans-serif", fontSize: 14 }}>
+      Carregando...
+    </div>
+  );
+
+  if (!session) return <Login />;
+
+  return <MainApp />;
+}
+
+// ─── APP PRINCIPAL ─────────────────────────────────────────────────────────────
+function MainApp() {
+  const { signOut } = useAuth();
+
   // Estados Globais
   const [chamados, setChamados] = useState([]);
   const [movimentacoes, setMovimentacoes] = useState([]);
@@ -192,7 +212,14 @@ export default function App() {
             {svg}
           </div>
         ))}
-        <div style={{ marginTop: "auto", width: 30, height: 30, borderRadius: "50%", background: C.royalMid, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: C.white, fontFamily: "'Montserrat',sans-serif" }}>TI</div>
+        <div style={{ marginTop: "auto", display: "flex", flexDirection: "column", alignItems: "center", gap: 8 }}>
+          <div style={{ width: 30, height: 30, borderRadius: "50%", background: C.royalMid, display: "flex", alignItems: "center", justifyContent: "center", fontSize: 10, fontWeight: 700, color: C.white, fontFamily: "'Montserrat',sans-serif" }}>TI</div>
+          <button onClick={signOut} title="Sair" style={{ background: "none", border: "none", cursor: "pointer", color: "rgba(255,255,255,0.4)", padding: 4, borderRadius: 4, fontSize: 16, lineHeight: 1 }}
+            onMouseEnter={e => e.currentTarget.style.color = "#fff"}
+            onMouseLeave={e => e.currentTarget.style.color = "rgba(255,255,255,0.4)"}>
+            ⏏
+          </button>
+        </div>
       </div>
 
       {/* ── INVENTÁRIO ── */}

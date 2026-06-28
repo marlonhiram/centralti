@@ -17,16 +17,25 @@ const app  = express();
 const PORT = process.env.API_PORT || 3001;
 
 // ─── CONEXÃO COM O BANCO ──────────────────────────────────────────────────────
-const pool = new Pool({
-  host:     process.env.DB_HOST     || "localhost",
-  port:     process.env.DB_PORT     || 5432,
-  database: process.env.DB_NAME     || "chamados_ti",
-  user:     process.env.DB_USER     || "postgres",
-  password: process.env.DB_PASSWORD || "",
-});
+// Em produção (Vercel), usa DATABASE_URL do Supabase (connection pooler).
+// Em desenvolvimento local, usa as variáveis individuais.
+const pool = new Pool(
+  process.env.DATABASE_URL
+    ? { connectionString: process.env.DATABASE_URL, ssl: { rejectUnauthorized: false } }
+    : {
+        host:     process.env.DB_HOST     || "localhost",
+        port:     parseInt(process.env.DB_PORT) || 5432,
+        database: process.env.DB_NAME     || "chamados_ti",
+        user:     process.env.DB_USER     || "postgres",
+        password: process.env.DB_PASSWORD || "",
+      }
+);
 
 // ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
-app.use(cors({ origin: "http://localhost:5173" }));
+const origensPermitidas = process.env.CORS_ORIGIN
+  ? process.env.CORS_ORIGIN.split(",")
+  : ["http://localhost:5173"];
+app.use(cors({ origin: origensPermitidas }));
 app.use(express.json());
 
 // Testa a conexão ao subir
@@ -68,9 +77,6 @@ const upload = multer({
     else cb(new Error("Tipo de arquivo não permitido. Use JPG, PNG, GIF ou PDF."));
   },
 });
-
-// ─── MIDDLEWARE ───────────────────────────────────────────────────────────────
-app.use(cors({ origin: "http://localhost:5173" }));
 
 // ─── HELPERS ──────────────────────────────────────────────────────────────────
 const ok  = (res, data)         => res.json({ ok: true, data });
@@ -964,8 +970,14 @@ app.post("/estoque/requisicoes/descontar-saida", async (req, res) => {
 
 
 // ─── START ────────────────────────────────────────────────────────────────────
-app.listen(PORT, "127.0.0.1", () => {
-  console.log(`\n🚀  API rodando em http://localhost:${PORT}`);
-  console.log(`    Frontend esperado em http://localhost:5173`);
-  console.log(`    Pressione Ctrl+C para parar\n`);
-});
+// Em desenvolvimento local: inicia o servidor normalmente.
+// Em produção (Vercel Function): exporta o app para ser chamado pela função.
+if (require.main === module) {
+  app.listen(PORT, "127.0.0.1", () => {
+    console.log(`\n🚀  API rodando em http://localhost:${PORT}`);
+    console.log(`    Frontend esperado em http://localhost:5173`);
+    console.log(`    Pressione Ctrl+C para parar\n`);
+  });
+}
+
+module.exports = app;

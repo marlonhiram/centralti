@@ -39,8 +39,8 @@ export const STATUS_ATIVOS = ["Aberto", "Em Análise"];
 /** Status considerados 'encerrados' (finalizados). */
 export const STATUS_ENCERRADOS = ["Fechado", "Sem Solução"];
 
-/** URL base da API backend. */
-export const BASE = "http://localhost:3001";
+/** URL base da API backend. Em produção (Vercel), definir VITE_API_URL=/api */
+export const BASE = import.meta.env.VITE_API_URL || "http://localhost:3001";
 
 // ─── FUNÇÕES AUXILIARES ────────────────────────────────────────────────────────
 
